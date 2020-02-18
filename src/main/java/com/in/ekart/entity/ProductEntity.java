@@ -7,12 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
-
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 
 @Entity
 @Table(name = "PRODUCT")
@@ -68,7 +63,7 @@ public class ProductEntity implements Serializable{
 	public void setPrice(Double price) {
 		this.price = price;
 	}
-
+	
 	@Override
 	public String toString() {
 		return "ProductEntity [id=" + id + ", name=" + name + ", description=" + description + ", price=" + price + "]";
