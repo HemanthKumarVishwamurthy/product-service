@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,9 +26,15 @@ public class ProductController {
 	private ProductService productService;
 
 	@GetMapping(value = "/products", produces = { MediaType.APPLICATION_JSON_VALUE })
-	public List<Product> getProducts() {
+	public List<Product> getProducts() throws Exception {
 		System.out.println("START : Get Products");
 		List<Product> products = productService.getProducts();
+		
+		if (CollectionUtils.isEmpty(products)) {
+			System.out.println("No Products available in the Store.");
+			throw new Exception("No Products available in the Store.");
+		}
+		
 		System.out.println("END : Get Products");
 		return products;
 	}

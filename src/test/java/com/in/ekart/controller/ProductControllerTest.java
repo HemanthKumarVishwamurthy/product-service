@@ -1,7 +1,6 @@
 package com.in.ekart.controller;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,50 +11,69 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import com.in.ekart.entity.ProductEntity;
 import com.in.ekart.model.Product;
-import com.in.ekart.respository.ProductRepository;
 import com.in.ekart.service.ProductService;
 import com.in.ekart.service.ProductServiceImpl;
 
 public class ProductControllerTest {
-
-	@Mock
-	private ProductController controller;
 	
 	@Mock
-	private ProductService productService;
+	private ProductController mockProductController;
 	
 	@Mock
-	private ProductRepository repository;
+	private ProductService mockProductService;
 	
 	@Before
-	public void setUp() {
-		controller = new ProductController();
-		productService = new ProductServiceImpl();
-		repository = Mockito.mock(ProductRepository.class);
+	public void setup() {
+		mockProductController = new ProductController();
+		mockProductService = Mockito.mock(ProductServiceImpl.class);
 		
-		ReflectionTestUtils.setField(productService, "productRepository", repository);
-		ReflectionTestUtils.setField(controller, "productService", productService);
+		ReflectionTestUtils.setField(mockProductController, "productService", mockProductService);
 	}
 	
 	@Test
-	public void TestGetProducts() {
+	public void TestGetProducts() throws Exception {
+		Mockito.when(mockProductService.getProducts()).thenReturn(getProductList());
 		
-		List<ProductEntity> entities = new ArrayList<ProductEntity>();
+		List<Product> response = mockProductController.getProducts();
 		
-		ProductEntity entity = new ProductEntity();
-		entity.setId(1L);
-		entity.setName("Laptop");
-		entity.setDescription("New Gen Laptop from Dell");
-		entity.setPrice(123000.00);
-		entities.add(entity);
-		Mockito.when(repository.findAll()).thenReturn(entities);
+		assertEquals("Iphone", response.get(0).getName());
+	}
+	
+	@Test
+	public void TestGetProducts_Exception() throws Exception {
+		Mockito.when(mockProductService.getProducts()).thenReturn(new ArrayList<>());
+		try {
+			List<Product> response = mockProductController.getProducts();
+		} catch (Exception e) {
+			assertEquals("No Products available in the Store.", e.getMessage());
+		}
+	}
+	
+	@Test
+	public void TestGetProductByName() throws Exception {
+		Mockito.when(mockProductService.getProduct(Mockito.anyString())).thenReturn(getProductList());
+
+		List<Product> response = mockProductController.getProducts("Iphone");
+
+		assertEquals("Iphone", response.get(0).getName());
+	}
+	
+	@Test(expected = Exception.class)
+	public void TestGetProductByName_Exception() throws Exception {
+		Mockito.when(mockProductService.getProduct(Mockito.anyString())).thenThrow(new Exception());
+		List<Product> response = mockProductController.getProducts("Iphone");
+	}
+
+	private List<Product> getProductList() {
+		Product product = new Product();
+		product.setId(1L);
+		product.setName("Iphone");
+		product.setDescription("Smart phone");
+		product.setPrice(90000.894);
 		
-		
-		List<Product> response = controller.getProducts();
-		
-		assertNotNull(response);
-		assertEquals("Laptop", response.get(0).getName());
+		List<Product> products = new ArrayList<>();
+		products.add(product);
+		return products;
 	}
 }
